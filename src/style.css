@@ -1,0 +1,101 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Fira Code", monospace;
+  background: radial-gradient(rgb(30, 30, 30), rgb(15, 15, 15));
+  color: #ffffff;
+}
+
+a {
+  text-decoration: none;
+  color: bisque;
+}
+
+ul {
+  list-style-type: none;
+}
+
+header p {
+  font-size: 120%;
+}
+
+h1 {
+  display: block;
+  font-size: 2em;
+  font-weight: bold;
+  margin-block-start: 0.67em;
+  margin-block-end: 0.67em;
+}
+
+.shell {
+  display: flex;
+  align-items: center;
+}
+
+#prompt-symbol {
+  margin: 2px;
+  font-weight: normal;
+  font-size: 20px;
+  color: green;
+}
+
+#prompt {
+  margin: 0;
+  padding-left: 6px;
+  font-family: monospace;
+}
+
+section {
+  max-width: 42em;
+  margin: 0;
+  padding: 0;
+}
+
+.imgjakepy {
+  width: 9em;
+  float: left;
+  padding: 1em;
+}
+
+.projects {
+  width: 50%;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.projects h2 {
+  width: 50%;
+  margin: 0 auto; /* Esto centra el elemento */
+  padding: 10px;
+}
+
+.projects li {
+  padding: 10px;
+}
+
+.post {
+  clear: both;
+  float: left;
+  padding: 1em;
+}
+
+footer {
+  background-color: blanchedalmond;
+  padding: 12px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  color: #000;
+}
+
+footer a {
+  color: #000;
+}
+
+footer p {
+  padding: 0;
+}
