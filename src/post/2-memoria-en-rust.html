@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jakepys | Memoria en rust</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <a href="../index.html">← Home</a>
+        </nav>
+    </header>
+
+    <main>
+        <h1 id="stack-y-heap-en-rust">Stack y Heap en Rust</h1>
+        <p>Como saben, la memoria en una computadora suele dividirse en varias
+            áreas principales: - Stack (pila) - Heap (monton) - Static (memoria
+            estática)</p>
+        <h2 id="static">Static</h2>
+        <p>En esta área se ubican las variables <code>static</code> que
+            definimos en el código y las cadenas con vida estática
+            <code>&amp;'static str</code>.
+        </p>
+        <p>Ejemplo: literales de cadena escritos en el binario permanecen en la
+            sección estática durante toda la ejecución.</p>
+        <h2 id="stack-pila">Stack (pila)</h2>
+        <p>La pila es la región de memoria donde, cada vez que se ejecuta una
+            función, se asigna un espacio (stack frame) para: - variables locales -
+            parámetros - espacio para el valor de retorno</p>
+        <p>Estructura conceptual:</p>
+        <pre><code>Stack
+
+-----------------
+|               |
+|   other fn 3  |  &lt;- si fn 3 termina, se desapila y vuelve el control a fn 2
+-----------------
+|               |
+|   other fn 2  |
+-----------------
+|               |
+|   other fn 1  |
+-----------------
+|               |
+|   fn main     |
+-----------------</code></pre>
+        <p><code>main</code> es la función principal en Rust; es la primera que
+            se apila. Cuando <code>main</code> llama a otra función, se crea un
+            nuevo frame encima del de <code>main</code>. El frame de
+            <code>main</code> queda inactivo hasta que la función llamada termina y
+            se desapila.
+        </p>
+        <p>Como el tamaño requerido en el stack por cada función suele conocerse
+            en tiempo de compilación, Rust suele necesitar tipos concretos (por
+            ejemplo <code>i32</code>, <code>u8</code>) para calcular correctamente
+            cuánto espacio reservar en el stack. Esto es una de las razones por las
+            que los tipos suelen ser explícitos o inferridos durante la
+            compilación.</p>
+        <h2 id="heap-monton">Heap (monton)</h2>
+        <p>El heap es la región de memoria usada para asignaciones dinámicas en
+            tiempo de ejecución, cuando no conocemos el tamaño en compilación.</p>
+        <p>Conceptualmente hay bloques de memoria distribuidos en el heap:</p>
+        <pre><code>Heap
+---------------------
+|                   |
+|         ------    |
+|         |    |    |
+|         ------    |
+|                   |
+|         -----     |
+|         |   |     |
+|         -----     |
+|                   |
+--------------------</code></pre>
+        <p>Cuando el programa necesita memoria dinámica, el compilador de rust
+            solicita al sistema operativo un bloque de memoria adecuado; el SO
+            devuelve la dirección donde está ese bloque. Trabajar con el heap
+            permite tamaños dinámicos que pueden crecer en ejecución, a costa de
+            mayor coste en tiempo (asignaciones y liberaciones son más lentas que en
+            el stack).</p>
+        <h2 id="notas-sobre-punteros-y-sitios-de-almacenamiento">Notas sobre
+            punteros y sitios de almacenamiento</h2>
+        <p>Las variables que usamos para acceder a los datos (p. ej. punteros o
+            estructuras en Rust que contienen referencias) siempre viven en el stack
+            cuando son locales; esas variables contienen direcciones que apuntan a
+            datos en el heap o en la sección estática.</p>
+        <h2 id="ejemplos-en-rust">Ejemplos en Rust</h2>
+        <h3 id="stack-arrays-con-tamaño-conocido-en-compilación">Stack (arrays
+            con tamaño conocido en compilación)</h3>
+        <div class="sourceCode" id="cb3">
+            <pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// array: se almacena en el stack porque su tamaño es conocido en tiempo de compilación</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">&quot;Array: [i32; 3]&quot;</span>)<span class="op">;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> <span class="kw">mut</span> a <span class="op">=</span> [<span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span>]<span class="op">;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">&quot;len: {}, ptr: {:p}&quot;</span><span class="op">,</span> a<span class="op">.</span>len()<span class="op">,</span> a<span class="op">.</span>as_ptr())<span class="op">;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">&quot;a[1] == {}&quot;</span><span class="op">,</span> a[<span class="dv">1</span>])<span class="op">;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    a[<span class="dv">1</span>] <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">&quot;a[1] == {}&quot;</span><span class="op">,</span> a[<span class="dv">1</span>])<span class="op">;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre>
+        </div>
+        <blockquote>
+            <p>Todos los tipos cuyo tamaño se conoce en compilación se colocan (o se
+                reservan) dentro del stack frame  de la función activa.</p>
+        </blockquote>
+        <h3 id="vector-vect-stack-heap">Vector (<code>Vec&lt;T&gt;</code>) —
+            stack + heap</h3>
+        <div class="sourceCode" id="cb4">
+            <pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Vec: la estructura (tamaño, puntero, len, capacity) vive en el stack;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// los elementos se almacenan en el heap</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">&quot;Vector Vec&lt;i32&gt;&quot;</span>)<span class="op">;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> <span class="kw">mut</span> v <span class="op">=</span> <span class="dt">Vec</span><span class="pp">::</span>new()<span class="op">;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;len: {}, capacity: {}, ptr: {:p}&quot;</span><span class="op">,</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        v<span class="op">.</span>len()<span class="op">,</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        v<span class="op">.</span>capacity()<span class="op">,</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        v<span class="op">.</span>as_ptr()</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    )<span class="op">;</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    v<span class="op">.</span>push(<span class="dv">1</span>)<span class="op">;</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    v<span class="op">.</span>push(<span class="dv">2</span>)<span class="op">;</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    v<span class="op">.</span>push(<span class="dv">3</span>)<span class="op">;</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">&quot;v[1] == {}&quot;</span><span class="op">,</span> v[<span class="dv">1</span>])<span class="op">;</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    v[<span class="dv">1</span>] <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">&quot;v[1] == {}&quot;</span><span class="op">,</span> v[<span class="dv">1</span>])<span class="op">;</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;len: {}, capacity: {}, ptr: {:p}&quot;</span><span class="op">,</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>        v<span class="op">.</span>len()<span class="op">,</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>        v<span class="op">.</span>capacity()<span class="op">,</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>        v<span class="op">.</span>as_ptr()</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    )<span class="op">;</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    v<span class="op">.</span>push(<span class="dv">4</span>)<span class="op">;</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    v<span class="op">.</span>push(<span class="dv">5</span>)<span class="op">;</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    v<span class="op">.</span>push(<span class="dv">6</span>)<span class="op">;</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;len: {}, capacity: {}, ptr: {:p}&quot;</span><span class="op">,</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>        v<span class="op">.</span>len()<span class="op">,</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>        v<span class="op">.</span>capacity()<span class="op">,</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>        v<span class="op">.</span>as_ptr()</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>    )<span class="op">;</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>    v<span class="op">.</span>pop()<span class="op">;</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;len: {}, capacity: {}, ptr: {:p}&quot;</span><span class="op">,</span></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>        v<span class="op">.</span>len()<span class="op">,</span></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>        v<span class="op">.</span>capacity()<span class="op">,</span></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>        v<span class="op">.</span>as_ptr()</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>    )<span class="op">;</span></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>    v<span class="op">.</span>drain(<span class="dv">0</span><span class="op">..</span>)<span class="op">;</span></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;len: {}, capacity: {}, ptr: {:p}&quot;</span><span class="op">,</span></span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>        v<span class="op">.</span>len()<span class="op">,</span></span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>        v<span class="op">.</span>capacity()<span class="op">,</span></span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>        v<span class="op">.</span>as_ptr()</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>    )<span class="op">;</span></span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre>
+        </div>
+        <blockquote>
+            <p><code>capacity</code> muestra la reserva interna en el heap: a menudo
+                un <code>Vec</code> reserva más espacio del estrictamente necesario para
+                evitar reasignaciones frecuentes.</p>
+        </blockquote>
+        <h3 id="literales-str-estático">Literales <code>&amp;str</code>
+            (estático)</h3>
+        <div class="sourceCode" id="cb5">
+            <pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// &amp;str: el literal vive en la sección estática del binario</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">&quot;&amp;str&quot;</span>)<span class="op">;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> s <span class="op">=</span> <span class="st">&quot;I love rust🦀❤️&quot;</span><span class="op">;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;len: {}, chars: {}, ptr: {:p}&quot;</span><span class="op">,</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        s<span class="op">.</span>len()<span class="op">,</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        s<span class="op">.</span>chars()<span class="op">.</span><span class="pp">collect::</span><span class="op">&lt;</span><span class="dt">Vec</span><span class="op">&lt;</span><span class="dt">char</span><span class="op">&gt;&gt;</span>()<span class="op">.</span>len()<span class="op">,</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        s<span class="op">.</span>as_ptr()</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    )<span class="op">;</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre>
+        </div>
+        <h3 id="string-stack-heap"><code>String</code> — stack + heap</h3>
+        <div class="sourceCode" id="cb6">
+            <pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// String: la estructura (len, capacity, puntero) está en el stack;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// el contenido se almacena en el heap</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">&quot;String&quot;</span>)<span class="op">;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> <span class="kw">mut</span> s <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">&quot;I love rust 🦀❤️&quot;</span>)<span class="op">;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;len: {}, chars: {}, ptr: {:p}&quot;</span><span class="op">,</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        s<span class="op">.</span>len()<span class="op">,</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        s<span class="op">.</span>chars()<span class="op">.</span><span class="pp">collect::</span><span class="op">&lt;</span><span class="dt">Vec</span><span class="op">&lt;</span><span class="dt">char</span><span class="op">&gt;&gt;</span>()<span class="op">.</span>len()<span class="op">,</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>        s<span class="op">.</span>as_ptr()</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    )<span class="op">;</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    s<span class="op">.</span>push(<span class="ch">&#39;C&#39;</span>)<span class="op">;</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    s<span class="op">.</span>push_str(<span class="st">&quot;!!!&quot;</span>)<span class="op">;</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    s<span class="op">.</span>pop()<span class="op">;</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">&quot;{}&quot;</span><span class="op">,</span> s)<span class="op">;</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;len: {}, chars: {}, ptr: {:p}&quot;</span><span class="op">,</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>        s<span class="op">.</span>len()<span class="op">,</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>        s<span class="op">.</span>chars()<span class="op">.</span><span class="pp">collect::</span><span class="op">&lt;</span><span class="dt">Vec</span><span class="op">&lt;</span><span class="dt">char</span><span class="op">&gt;&gt;</span>()<span class="op">.</span>len()<span class="op">,</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>        s<span class="op">.</span>as_ptr()</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    )<span class="op">;</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre>
+        </div>
+        <h3 id="boxt-valores-en-el-heap"><code>Box&lt;T&gt;</code> — valores en
+            el heap</h3>
+        <div class="sourceCode" id="cb7">
+            <pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Box: guarda el valor en el heap; la caja (el puntero) vive en el stack</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">&quot;Box Box&lt;[i32; 3]&gt;&quot;</span>)<span class="op">;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> <span class="kw">mut</span> b <span class="op">=</span> <span class="dt">Box</span><span class="pp">::</span>new([<span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span>])<span class="op">;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">&quot;len: {}, ptr: {:p}&quot;</span><span class="op">,</span> b<span class="op">.</span>len()<span class="op">,</span> b<span class="op">.</span>as_ptr())<span class="op">;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">&quot;b[1] == {}&quot;</span><span class="op">,</span> b[<span class="dv">1</span>])<span class="op">;</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    b[<span class="dv">1</span>] <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">&quot;b[1] == {}&quot;</span><span class="op">,</span> b[<span class="dv">1</span>])<span class="op">;</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre>
+        </div>
+
+    </main>
+</body>
+
+</html>
