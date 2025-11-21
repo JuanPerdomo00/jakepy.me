@@ -1,0 +1,8 @@
+name = "portfolio"
+main = "src/index.js"
+compatibility_date = "2025-11-21"
+
+
+[assets]
+directory = "./src"  
+binding = "ASSETS"  
