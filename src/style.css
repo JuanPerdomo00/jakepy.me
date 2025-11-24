@@ -7,9 +7,9 @@
 body,
 html {
     height: 100%;
-    background: #0d0d0d;
-    color: #0f0;
-    font-family: 'Source Code Pro', monospace;
+    background: #ffe7de;
+    color: #c3829e;
+    font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -26,15 +26,15 @@ header {
 }
 
 #presentation {
-    color: #0f0;
+    color: #000;
 }
 
 #imgjakepys {
     width: 140px;
     height: 140px;
     border-radius: 50%;
-    border: 4px solid #0f0;
-    box-shadow: 0 0 30px #0f05;
+    border: 4px solid #fcd1d7;
+    box-shadow: 0 0 30px #e9b1cd;
     margin-bottom: 1.5rem;
     object-fit: cover;
 }
@@ -43,11 +43,11 @@ h1 {
     font-family: 'SUSE Mono', monospace;
     font-size: 2.8rem;
     margin: 0.5rem 0;
-    text-shadow: 0 0 10px #0f0;
+    text-shadow: 0 0 10px #e9b1cd;
 }
 
 h1 span {
-    color: #00ff88;
+    color: #e9b1cd;
 }
 
 p {
@@ -62,17 +62,17 @@ nav {
 }
 
 nav a {
-    color: #0f0;
+    color: #c3829e;
     text-decoration: none;
     margin: 0 1.5rem;
     font-weight: bold;
-    text-shadow: 0 0 10px #0f0;
+    text-shadow: 0 0 10px #562135;
     transition: all 0.3s;
 }
 
 nav a:hover {
-    color: #00ff88;
-    text-shadow: 0 0 20px #0f08;
+    color: #fcd1d7;
+    text-shadow: 0 0 20px #ffe7de;
 }
 
 .simple-text {
@@ -91,7 +91,7 @@ main {
 }
 
 main h2 {
-    color: #0f0;
+    color: #562135;
     text-align: center;
     margin: 3rem 0 2rem;
     font-size: 2rem;
@@ -110,14 +110,14 @@ main li {
 }
 
 main a {
-    color: #0f0;
+    color: #c3829e;
     text-decoration: none;
 }
 
 main a:hover {
-    color: #00ff88;
+    color: #c3829e;
 }
 
 main small {
-    color: #00aa00;
+    color: #fcd1d7;
 }
