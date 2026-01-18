@@ -6,15 +6,16 @@
 
 body,
 html {
-    height: 100%;
+    min-height: 100%;
     background: #ffe7de;
     color: #c3829e;
-    font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    overflow-x: hidden;
+}
+
+body {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    overflow-x: hidden;
     min-height: 100vh;
 }
 
@@ -50,7 +51,7 @@ h1 span {
     color: #e9b1cd;
 }
 
-p {
+header p {
     font-size: 1.1rem;
     opacity: 0.9;
     max-width: 600px;
@@ -78,6 +79,8 @@ nav a:hover {
 .simple-text {
     text-align: center;
     max-width: 600px;
+    margin: 2rem auto;
+    padding: 0 1rem;
     font-size: 1.2rem;
     line-height: 1.8;
     opacity: 0.9;
@@ -85,39 +88,175 @@ nav a:hover {
 
 main {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 2rem 3rem;
+}
+
+main h1 {
+    color: #562135;
+    margin: 2rem 0 1.5rem;
+    font-size: 2.5rem;
 }
 
 main h2 {
     color: #562135;
-    text-align: center;
-    margin: 3rem 0 2rem;
+    margin: 2.5rem 0 1.5rem;
     font-size: 2rem;
+}
+
+main h3 {
+    color: #c3829e;
+    margin: 2rem 0 1rem;
+    font-size: 1.5rem;
+}
+
+main p {
+    line-height: 1.8;
+    margin: 1rem 0;
+    color: #562135;
+}
+
+main p.simple-text {
+    color: #c3829e;
+    text-align: center;
 }
 
 main ul {
     list-style: none;
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 0 1rem;
+    margin: 1rem 0;
+    padding: 0;
 }
 
 main li {
     margin: 1rem 0;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #562135;
+}
+
+main > ul > li {
     font-size: 1.2rem;
+}
+
+main li ul {
+    margin-left: 2rem;
+    margin-top: 0.5rem;
+}
+
+main li ul li {
+    margin: 0.5rem 0;
+    padding-left: 1rem;
+    position: relative;
+}
+
+main li ul li::before {
+    content: "→";
+    position: absolute;
+    left: -0.5rem;
+    color: #c3829e;
 }
 
 main a {
     color: #c3829e;
     text-decoration: none;
+    transition: color 0.3s;
 }
 
 main a:hover {
-    color: #c3829e;
+    color: #e9b1cd;
 }
 
 main small {
     color: #fcd1d7;
+    font-size: 0.9rem;
+}
+
+main code {
+    background: #fcd1d7;
+    color: #562135;
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+}
+
+main pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 1rem;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+}
+
+main pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+}
+
+main table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+}
+
+main th,
+main td {
+    padding: 0.75rem;
+    text-align: left;
+    border: 1px solid #fcd1d7;
+}
+
+main th {
+    background: #fcd1d7;
+    color: #562135;
+    font-weight: bold;
+}
+
+main td {
+    color: #562135;
+}
+
+main blockquote {
+    border-left: 4px solid #e9b1cd;
+    padding-left: 1rem;
+    margin: 1.5rem 0;
+    font-style: italic;
+    color: #562135;
+    opacity: 0.9;
+}
+
+main strong {
+    color: #562135;
+    font-weight: bold;
+}
+
+.sourceCode {
+    margin: 1.5rem 0;
+}
+
+@media (max-width: 768px) {
+    main {
+        padding: 0 1rem 2rem;
+    }
+    
+    h1 {
+        font-size: 2rem;
+    }
+    
+    main h1 {
+        font-size: 2rem;
+    }
+    
+    main h2 {
+        font-size: 1.6rem;
+    }
+    
+    nav a {
+        margin: 0 0.5rem;
+        font-size: 0.9rem;
+    }
 }
