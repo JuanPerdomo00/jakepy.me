@@ -1,23 +1,9 @@
-# Gleam
 /build
 erl_crash.dump
-
-# Output generado (se regenera con `bun run build`)
 /dist
-
-# Node / Bun
 node_modules/
 bun.lock
 bun.lockb
-
-# CSS generado por Tailwind (si prefieres versionarlo, borra esta línea)
-# /dist/static/style.css ya cubierto por /dist
-
-# Editor / OS
 .DS_Store
-*.swp
-.vscode/
-.idea/
-
 # Logs
 *.log
