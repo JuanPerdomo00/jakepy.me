@@ -8,10 +8,10 @@ let isMuted = false;
 playBtn.addEventListener("click", () => {
     if (isPlaying) {
         audio.pause();
-        playBtn.textContent = "▶";
+        playBtn.textContent = "";
     } else {
         audio.play();
-        playBtn.textContent = "⏸";
+        playBtn.textContent = "";
     }
     isPlaying = !isPlaying;
 });
@@ -19,5 +19,5 @@ playBtn.addEventListener("click", () => {
 muteBtn.addEventListener("click", () => {
     isMuted = !isMuted;
     audio.muted = isMuted;
-    muteBtn.textContent = isMuted ? "🔇" : "🔊";
+    muteBtn.textContent = isMuted ? "" : "";
 });
